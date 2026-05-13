@@ -1,87 +1,61 @@
-using iText.IO.Font.Constants;
-using iText.Kernel.Font;
-using iText.Kernel.Pdf;
-using iText.Layout;
-using iText.Layout.Element;
 using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using Tela1_Acesso;
-using static Tela1_Acesso.Orçamentos;
 
 namespace FullSoundApp
 {
-
-
-
     public partial class Agenda : Form
     {
         string conexao = "Server=localhost;Database=FullSound;Uid=root;Pwd=;";
 
+        private int idServico = 0;
+
         public Agenda()
         {
             InitializeComponent();
-            CarregarClientes();
+
             this.FormBorderStyle = FormBorderStyle.None;
             this.ControlBox = false;
             this.WindowState = FormWindowState.Maximized;
             this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
-            comboTipoServico.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboTipoServico.Items.AddRange(new object[]
-            {
-                "Instalação",
-                "Manutenção",
-                "Sonorização de evento",
-                "Locação de equipamentos",
-                "Orçamento rápido"
-            });
+
+            dgvAgendamentos.CellClick -= dgvAgendamentos_CellClick;
+            dgvAgendamentos.CellClick += dgvAgendamentos_CellClick;
+
+            ConfigurarComboServico();
+
             dtpData.Format = DateTimePickerFormat.Short;
             mtxHora.Mask = "00:00";
-            dgvAgendamentos.AutoGenerateColumns = true;
 
-            /*
-            
+            dgvAgendamentos.AutoGenerateColumns = true;
             dgvAgendamentos.ReadOnly = true;
             dgvAgendamentos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvAgendamentos.MultiSelect = false;
-             */
-            dgvAgendamentos.DefaultCellStyle.ForeColor = Color.Black;
+
+            ConfigurarDgv();
+            CarregarClientes();
         }
 
-
-        private void CarregarAgendamentos()
+        private void Agenda_Load(object sender, EventArgs e)
         {
+            Carregar();
+        }
 
-            /*
-            using (MySqlConnection conn = new MySqlConnection(conexao))
-            {
-                conn.Open();
+        private void ConfigurarComboServico()
+        {
+            comboTipoServico.Items.Clear();
 
-                string sql = @"SELECT c.nome, a.data, a.hora, a.tipo_servico
-                       FROM agenda a
-                       JOIN Clientes c ON c.id_cliente = a.id_cliente";
+            comboTipoServico.Items.Add("Instalação");
+            comboTipoServico.Items.Add("Manutenção");
+            comboTipoServico.Items.Add("Sonorização de evento");
+            comboTipoServico.Items.Add("Locação de equipamentos");
+            comboTipoServico.Items.Add("Orçamento rápido");
 
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                MySqlDataReader dr = cmd.ExecuteReader();
-
-                while (dr.Read())
-                {
-                    agendamentos.Add(new Agendamento
-                    {
-                        Cliente = dr["nome"].ToString(),
-                        Data = Convert.ToDateTime(dr["data"]),
-                        Hora = dr["hora"].ToString(),
-                        TipoServico = dr["tipo_servico"].ToString()
-                    });
-                }
-            }
-
-            dgvAgendamentos.DataSource = null;
-            dgvAgendamentos.DataSource = agendamentos;*/
+            comboTipoServico.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboTipoServico.SelectedIndex = -1;
         }
 
         private void ConfigurarDgv()
@@ -89,133 +63,54 @@ namespace FullSoundApp
             dgvAgendamentos.EnableHeadersVisualStyles = false;
             dgvAgendamentos.BackgroundColor = Color.FromArgb(32, 32, 32);
             dgvAgendamentos.BorderStyle = BorderStyle.None;
-            dgvAgendamentos.CellBorderStyle = DataGridViewCellBorderStyle.None;
+            dgvAgendamentos.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvAgendamentos.GridColor = Color.FromArgb(45, 45, 45);
 
-            dgvAgendamentos.ColumnHeadersDefaultCellStyle.BackColor =
-                Color.FromArgb(45, 45, 45);
+            dgvAgendamentos.RowHeadersVisible = false;
+            dgvAgendamentos.AllowUserToAddRows = false;
+            dgvAgendamentos.AllowUserToResizeRows = false;
+
+            dgvAgendamentos.DefaultCellStyle.BackColor = Color.FromArgb(38, 38, 38);
+            dgvAgendamentos.DefaultCellStyle.ForeColor = Color.White;
+            dgvAgendamentos.DefaultCellStyle.SelectionBackColor = Color.FromArgb(55, 55, 55);
+            dgvAgendamentos.DefaultCellStyle.SelectionForeColor = Color.White;
+
+            dgvAgendamentos.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(45, 45, 45);
             dgvAgendamentos.ColumnHeadersDefaultCellStyle.ForeColor = Color.Orange;
             dgvAgendamentos.ColumnHeadersDefaultCellStyle.Font =
                 new Font("Segoe UI", 9, FontStyle.Bold);
 
-            dgvAgendamentos.DefaultCellStyle.BackColor =
-                Color.FromArgb(38, 38, 38);
-            dgvAgendamentos.DefaultCellStyle.ForeColor = Color.White;
-            dgvAgendamentos.DefaultCellStyle.SelectionBackColor =
-                dgvAgendamentos.DefaultCellStyle.BackColor;
-            dgvAgendamentos.DefaultCellStyle.SelectionForeColor =
-                dgvAgendamentos.DefaultCellStyle.ForeColor;
-
-            dgvAgendamentos.SelectionMode =
-                DataGridViewSelectionMode.FullRowSelect;
-
-            dgvAgendamentos.RowTemplate.Height = 44;
-            dgvAgendamentos.ClearSelection();
+            dgvAgendamentos.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            dgvAgendamentos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvAgendamentos.RowTemplate.Height = 40;
         }
+
         private void CarregarClientes()
         {
             using (MySqlConnection conn = new MySqlConnection(conexao))
             {
-                conn.Open();
-                string sql = "SELECT id_cliente, nome FROM Clientes ORDER BY nome";
-                MySqlDataAdapter da = new MySqlDataAdapter(sql, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                cbClientes.DataSource = dt;
+                try
+                {
+                    conn.Open();
 
-                cbClientes.DisplayMember = "nome";
+                    string sql = "SELECT id_cliente, nome FROM Clientes ORDER BY nome";
 
+                    MySqlDataAdapter da = new MySqlDataAdapter(sql, conn);
+                    DataTable dt = new DataTable();
+
+                    da.Fill(dt);
+
+                    cbClientes.DataSource = null;
+                    cbClientes.DataSource = dt;
+                    cbClientes.DisplayMember = "nome";
+                    cbClientes.ValueMember = "id_cliente";
+                    cbClientes.SelectedIndex = -1;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao carregar clientes: " + ex.Message);
+                }
             }
-        }
-        private void btnAdicionarServico_Click(object sender, EventArgs e)
-        {
-
-        }
-        private void btnPesquisar_Click(object sender, EventArgs e)
-        {
-            /*
-            bool filtrarTipo = comboTipoServico.SelectedItem != null;
-            bool filtrarHora = mtxHora.MaskCompleted;
-            string? tipo = filtrarTipo ? comboTipoServico.Text : null;
-            DateTime data = dtpData.Value.Date;
-            string hora = mtxHora.Text;
-            var resultado = agendamentos.Where(a =>
-                a.Data.Date == data &&
-                (!filtrarTipo || a.TipoServico == tipo) &&
-                (!filtrarHora || a.Hora == hora)
-            ).ToList();
-            dgvAgendamentos.DataSource =
-                resultado.Count == 0 ? agendamentos : resultado;*/
-        }
-        private void btnEmitirComprovante_Click(object sender, EventArgs e)
-        {
-        }
-        private void btnServiço_Click(object sender, EventArgs e)
-        {
-
-            if (cbClientes.SelectedItem == null ||
-                    comboTipoServico.SelectedItem == null ||
-                    !mtxHora.MaskCompleted)
-            {
-                MessageBox.Show("Preencha todos os campos.");
-                return;
-            }
-
-            using (MySqlConnection conn = new MySqlConnection(conexao))
-            {
-                conn.Open();
-
-
-                string sql = @"INSERT INTO agenda 
-    (id_cliente, data_agendamento, hora_agendamento, tipo_servico)
-    VALUES (@id_cliente, @data, @hora, @tipo)";
-
-
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-
-                cmd.Parameters.AddWithValue("@id_cliente",
-                    ((DataRowView)cbClientes.SelectedItem)["id_cliente"]);
-
-                cmd.Parameters.AddWithValue("@data", dtpData.Value.Date);
-                cmd.Parameters.AddWithValue("@hora", mtxHora.Text);
-                cmd.Parameters.AddWithValue("@tipo", comboTipoServico.Text);
-
-                cmd.ExecuteNonQuery();
-            }
-
-            MessageBox.Show("Agendamento salvo com sucesso!");
-
-            Carregar();
-
-        }
-        private void btnEmitirComprovante_Click_1(object sender, EventArgs e)
-        {
-        }
-        private void pbHome_Click(object sender, EventArgs e)
-        {
-            Home home = new Home();
-            this.Hide();
-            home.Show();
-        }
-        private void pbClientes_Click(object sender, EventArgs e)
-        {
-            TelaCliente cliente = new TelaCliente();
-            this.Hide();
-            cliente.Show();
-        }
-        private void pbOrcamento_Click(object sender, EventArgs e)
-        {
-            Orçamentos orcamentos = new Orçamentos();
-            this.Hide();
-            orcamentos.Show();
-        }
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
-        private void cbClientes_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void Carregar()
@@ -226,38 +121,231 @@ namespace FullSoundApp
                 {
                     conn.Open();
 
-                    string sql = "select * from agenda";
+                    string sql = @"
+                        SELECT 
+                            a.id_servico,
+                            c.nome AS Cliente,
+                            DATE_FORMAT(a.data_agendamento, '%d/%m/%Y') AS Data,
+                            a.hora_agendamento AS Hora,
+                            COALESCE(a.tipo_servico, '') AS Servico
+                        FROM agenda a
+                        INNER JOIN Clientes c 
+                            ON c.id_cliente = a.id_cliente
+                        ORDER BY a.id_servico DESC";
 
                     MySqlDataAdapter da = new MySqlDataAdapter(sql, conn);
                     DataTable dt = new DataTable();
+
                     da.Fill(dt);
 
+                    dgvAgendamentos.DataSource = null;
                     dgvAgendamentos.DataSource = dt;
+
+                    if (dgvAgendamentos.Columns.Contains("id_servico"))
+                    {
+                        dgvAgendamentos.Columns["id_servico"].HeaderText = "ID";
+                    }
+
+                    idServico = 0;
+                    dgvAgendamentos.ClearSelection();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    MessageBox.Show("Erro ao carregar agendamentos: " + ex.Message);
                 }
             }
         }
-        private void Agenda_Load(object sender, EventArgs e)
+
+        private void btnServiço_Click(object sender, EventArgs e)
         {
-            Carregar();
-        }
-        private int idServico;
-        private void dgvAgendamentos_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
+            if (cbClientes.SelectedIndex == -1 || cbClientes.SelectedValue == null)
             {
-                idServico = Convert.ToInt32(
-                    dgvAgendamentos.Rows[e.RowIndex].Cells["id_servico"].Value
-                );
+                MessageBox.Show("Selecione um cliente.");
+                return;
+            }
+
+            if (comboTipoServico.SelectedIndex == -1)
+            {
+                MessageBox.Show("Selecione o tipo de serviço.");
+                return;
+            }
+
+            if (!mtxHora.MaskCompleted)
+            {
+                MessageBox.Show("Informe a hora.");
+                return;
+            }
+
+            string tipoServico = comboTipoServico.SelectedItem.ToString();
+
+            using (MySqlConnection conn = new MySqlConnection(conexao))
+            {
+                try
+                {
+                    conn.Open();
+
+                    string sql = @"
+                        INSERT INTO agenda
+                        (
+                            id_cliente,
+                            data_agendamento,
+                            hora_agendamento,
+                            tipo_servico
+                        )
+                        VALUES
+                        (
+                            @id_cliente,
+                            @data,
+                            @hora,
+                            @tipo_servico
+                        )";
+
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+                    cmd.Parameters.AddWithValue("@id_cliente", cbClientes.SelectedValue);
+                    cmd.Parameters.AddWithValue("@data", dtpData.Value.Date);
+                    cmd.Parameters.AddWithValue("@hora", mtxHora.Text);
+                    cmd.Parameters.AddWithValue("@tipo_servico", tipoServico);
+
+                    cmd.ExecuteNonQuery();
+
+                    MessageBox.Show("Agendamento salvo com sucesso!");
+
+                    Carregar();
+
+                    cbClientes.SelectedIndex = -1;
+                    comboTipoServico.SelectedIndex = -1;
+                    mtxHora.Clear();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao salvar agendamento: " + ex.Message);
+                }
             }
         }
+
+        private void dgvAgendamentos_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+                return;
+
+            PegarIdServicoDaLinha(e.RowIndex);
+        }
+
+        private void PegarIdServicoDaLinha(int rowIndex)
+        {
+            try
+            {
+                if (rowIndex < 0)
+                    return;
+
+                if (!dgvAgendamentos.Columns.Contains("id_servico"))
+                    return;
+
+                object valor = dgvAgendamentos.Rows[rowIndex].Cells["id_servico"].Value;
+
+                if (valor == null || valor == DBNull.Value)
+                    return;
+
+                idServico = Convert.ToInt32(valor);
+            }
+            catch
+            {
+                idServico = 0;
+            }
+        }
+
+        private bool SelecionarAgendamentoAtual()
+        {
+            try
+            {
+                if (dgvAgendamentos.CurrentRow == null)
+                    return false;
+
+                if (!dgvAgendamentos.Columns.Contains("id_servico"))
+                    return false;
+
+                object valor = dgvAgendamentos.CurrentRow.Cells["id_servico"].Value;
+
+                if (valor == null || valor == DBNull.Value)
+                    return false;
+
+                idServico = Convert.ToInt32(valor);
+
+                return idServico > 0;
+            }
+            catch
+            {
+                idServico = 0;
+                return false;
+            }
+        }
+
+        private void AbrirTelaOrcamento()
+        {
+            if (!SelecionarAgendamentoAtual())
+            {
+                MessageBox.Show("Clique em um agendamento da tabela antes de abrir o orçamento.");
+                return;
+            }
+
+            Orçamentos orcamentos = new Orçamentos(idServico);
+            this.Hide();
+            orcamentos.Show();
+        }
+
         private void btnOrcamento_Click(object sender, EventArgs e)
         {
-            Orçamentos frm = new Orçamentos(idServico);
-            frm.Show();
+            AbrirTelaOrcamento();
+        }
+
+        private void pbOrcamento_Click(object sender, EventArgs e)
+        {
+            AbrirTelaOrcamento();
+        }
+
+        private void pbHome_Click(object sender, EventArgs e)
+        {
+            Home home = new Home();
+            this.Hide();
+            home.Show();
+        }
+
+        private void pbClientes_Click(object sender, EventArgs e)
+        {
+            TelaCliente cliente = new TelaCliente();
+            this.Hide();
+            cliente.Show();
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void cbClientes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnAdicionarServico_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnPesquisar_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnEmitirComprovante_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnEmitirComprovante_Click_1(object sender, EventArgs e)
+        {
+
         }
     }
 }

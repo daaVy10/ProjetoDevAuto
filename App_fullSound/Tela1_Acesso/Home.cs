@@ -1,12 +1,6 @@
 ﻿using FullSoundApp;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Tela1_Acesso
@@ -16,11 +10,13 @@ namespace Tela1_Acesso
         public Home()
         {
             InitializeComponent();
+
             this.FormBorderStyle = FormBorderStyle.None;
             this.ControlBox = false;
             this.WindowState = FormWindowState.Maximized;
             this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
         }
+
         private void pictureBox2_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -52,10 +48,11 @@ namespace Tela1_Acesso
 
         private void pbOrcamento_Click(object sender, EventArgs e)
         {
-            Orçamentos orcamentos = new Orçamentos();
-            orcamentos.Show();
+            // Abre Orçamentos sem agendamento selecionado.
+            // Na tela Orçamentos, ele vai listar os serviços.
+            Orçamentos telaorcamentos = new Orçamentos(0);
+            telaorcamentos.Show();
             this.Hide();
-
         }
 
         private void pictureBox3_Click(object sender, EventArgs e)
