@@ -12,6 +12,7 @@ namespace FullSoundApp
         string conexao = "Server=localhost;Database=FullSound;Uid=root;Pwd=;";
 
         private int idServico = 0;
+        private bool carregandoClientes = false;
 
         public Agenda()
         {
@@ -25,17 +26,16 @@ namespace FullSoundApp
             dgvAgendamentos.CellClick -= dgvAgendamentos_CellClick;
             dgvAgendamentos.CellClick += dgvAgendamentos_CellClick;
 
+            cbClientes.SelectedIndexChanged -= cbClientes_SelectedIndexChanged;
+            cbClientes.SelectedIndexChanged += cbClientes_SelectedIndexChanged;
+
             ConfigurarComboServico();
 
             dtpData.Format = DateTimePickerFormat.Short;
             mtxHora.Mask = "00:00";
 
-            dgvAgendamentos.AutoGenerateColumns = true;
-            dgvAgendamentos.ReadOnly = true;
-            dgvAgendamentos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvAgendamentos.MultiSelect = false;
-
             ConfigurarDgv();
+
             CarregarClientes();
         }
 
@@ -52,7 +52,6 @@ namespace FullSoundApp
             comboTipoServico.Items.Add("Manutenção");
             comboTipoServico.Items.Add("Sonorização de evento");
             comboTipoServico.Items.Add("Locação de equipamentos");
-            comboTipoServico.Items.Add("Orçamento rápido");
 
             comboTipoServico.DropDownStyle = ComboBoxStyle.DropDownList;
             comboTipoServico.SelectedIndex = -1;
@@ -60,29 +59,56 @@ namespace FullSoundApp
 
         private void ConfigurarDgv()
         {
+            dgvAgendamentos.AutoGenerateColumns = true;
+            dgvAgendamentos.Enabled = true;
+            dgvAgendamentos.ReadOnly = true;
+
+            dgvAgendamentos.AllowUserToAddRows = false;
+            dgvAgendamentos.AllowUserToDeleteRows = false;
+            dgvAgendamentos.AllowUserToResizeRows = false;
+            dgvAgendamentos.AllowUserToResizeColumns = false;
+
+            dgvAgendamentos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvAgendamentos.MultiSelect = false;
+
+            dgvAgendamentos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
             dgvAgendamentos.EnableHeadersVisualStyles = false;
             dgvAgendamentos.BackgroundColor = Color.FromArgb(32, 32, 32);
             dgvAgendamentos.BorderStyle = BorderStyle.None;
-            dgvAgendamentos.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvAgendamentos.GridColor = Color.FromArgb(45, 45, 45);
+            dgvAgendamentos.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
 
             dgvAgendamentos.RowHeadersVisible = false;
-            dgvAgendamentos.AllowUserToAddRows = false;
-            dgvAgendamentos.AllowUserToResizeRows = false;
 
-            dgvAgendamentos.DefaultCellStyle.BackColor = Color.FromArgb(38, 38, 38);
-            dgvAgendamentos.DefaultCellStyle.ForeColor = Color.White;
-            dgvAgendamentos.DefaultCellStyle.SelectionBackColor = Color.FromArgb(55, 55, 55);
-            dgvAgendamentos.DefaultCellStyle.SelectionForeColor = Color.White;
+            dgvAgendamentos.ColumnHeadersDefaultCellStyle.BackColor =
+                Color.FromArgb(45, 45, 45);
 
-            dgvAgendamentos.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(45, 45, 45);
-            dgvAgendamentos.ColumnHeadersDefaultCellStyle.ForeColor = Color.Orange;
+            dgvAgendamentos.ColumnHeadersDefaultCellStyle.ForeColor =
+                Color.Orange;
+
+            dgvAgendamentos.ColumnHeadersDefaultCellStyle.SelectionBackColor =
+                Color.FromArgb(45, 45, 45);
+
+            dgvAgendamentos.ColumnHeadersDefaultCellStyle.SelectionForeColor =
+                Color.Orange;
+
             dgvAgendamentos.ColumnHeadersDefaultCellStyle.Font =
                 new Font("Segoe UI", 9, FontStyle.Bold);
 
-            dgvAgendamentos.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-            dgvAgendamentos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvAgendamentos.RowTemplate.Height = 40;
+            dgvAgendamentos.DefaultCellStyle.BackColor =
+                Color.FromArgb(38, 38, 38);
+
+            dgvAgendamentos.DefaultCellStyle.ForeColor =
+                Color.White;
+
+            dgvAgendamentos.DefaultCellStyle.SelectionBackColor =
+                Color.DarkOrange;
+
+            dgvAgendamentos.DefaultCellStyle.SelectionForeColor =
+                Color.Black;
+
+            dgvAgendamentos.RowTemplate.Height = 35;
         }
 
         private void CarregarClientes()
@@ -91,24 +117,40 @@ namespace FullSoundApp
             {
                 try
                 {
+                    carregandoClientes = true;
+
                     conn.Open();
 
-                    string sql = "SELECT id_cliente, nome FROM Clientes ORDER BY nome";
+                    string sql = @"
+                        SELECT 
+                            id_cliente,
+                            nome
+                        FROM Clientes
+                        ORDER BY nome";
 
                     MySqlDataAdapter da = new MySqlDataAdapter(sql, conn);
                     DataTable dt = new DataTable();
 
                     da.Fill(dt);
 
+                    DataRow linhaTodos = dt.NewRow();
+                    linhaTodos["id_cliente"] = 0;
+                    linhaTodos["nome"] = "Todos os clientes";
+                    dt.Rows.InsertAt(linhaTodos, 0);
+
                     cbClientes.DataSource = null;
                     cbClientes.DataSource = dt;
                     cbClientes.DisplayMember = "nome";
                     cbClientes.ValueMember = "id_cliente";
-                    cbClientes.SelectedIndex = -1;
+                    cbClientes.SelectedValue = 0;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Erro ao carregar clientes: " + ex.Message);
+                }
+                finally
+                {
+                    carregandoClientes = false;
                 }
             }
         }
@@ -123,10 +165,10 @@ namespace FullSoundApp
 
                     string sql = @"
                         SELECT 
-                            a.id_servico,
+                            a.id_servico AS ID,
                             c.nome AS Cliente,
                             DATE_FORMAT(a.data_agendamento, '%d/%m/%Y') AS Data,
-                            a.hora_agendamento AS Hora,
+                            TIME_FORMAT(a.hora_agendamento, '%H:%i') AS Hora,
                             COALESCE(a.tipo_servico, '') AS Servico
                         FROM agenda a
                         INNER JOIN Clientes c 
@@ -141,9 +183,9 @@ namespace FullSoundApp
                     dgvAgendamentos.DataSource = null;
                     dgvAgendamentos.DataSource = dt;
 
-                    if (dgvAgendamentos.Columns.Contains("id_servico"))
+                    if (dgvAgendamentos.Columns.Contains("ID"))
                     {
-                        dgvAgendamentos.Columns["id_servico"].HeaderText = "ID";
+                        dgvAgendamentos.Columns["ID"].Visible = false;
                     }
 
                     idServico = 0;
@@ -156,11 +198,86 @@ namespace FullSoundApp
             }
         }
 
+        private void CarregarPorCliente(int idCliente)
+        {
+            using (MySqlConnection conn = new MySqlConnection(conexao))
+            {
+                try
+                {
+                    conn.Open();
+
+                    string sql = @"
+                        SELECT 
+                            a.id_servico AS ID,
+                            c.nome AS Cliente,
+                            DATE_FORMAT(a.data_agendamento, '%d/%m/%Y') AS Data,
+                            TIME_FORMAT(a.hora_agendamento, '%H:%i') AS Hora,
+                            COALESCE(a.tipo_servico, '') AS Servico
+                        FROM agenda a
+                        INNER JOIN Clientes c 
+                            ON c.id_cliente = a.id_cliente
+                        WHERE a.id_cliente = @idCliente
+                        ORDER BY a.id_servico DESC";
+
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@idCliente", idCliente);
+
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+
+                    da.Fill(dt);
+
+                    dgvAgendamentos.DataSource = null;
+                    dgvAgendamentos.DataSource = dt;
+
+                    if (dgvAgendamentos.Columns.Contains("ID"))
+                    {
+                        dgvAgendamentos.Columns["ID"].Visible = false;
+                    }
+
+                    idServico = 0;
+                    dgvAgendamentos.ClearSelection();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao filtrar cliente: " + ex.Message);
+                }
+            }
+        }
+
+        private void cbClientes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (carregandoClientes)
+                return;
+
+            if (cbClientes.SelectedValue == null || cbClientes.SelectedValue is DataRowView)
+                return;
+
+            int idCliente = Convert.ToInt32(cbClientes.SelectedValue);
+
+            if (idCliente == 0)
+            {
+                Carregar();
+            }
+            else
+            {
+                CarregarPorCliente(idCliente);
+            }
+        }
+
         private void btnServiço_Click(object sender, EventArgs e)
         {
-            if (cbClientes.SelectedIndex == -1 || cbClientes.SelectedValue == null)
+            if (cbClientes.SelectedValue == null || cbClientes.SelectedValue is DataRowView)
             {
                 MessageBox.Show("Selecione um cliente.");
+                return;
+            }
+
+            int idCliente = Convert.ToInt32(cbClientes.SelectedValue);
+
+            if (idCliente == 0)
+            {
+                MessageBox.Show("Selecione um cliente válido. Não use 'Todos os clientes' para cadastrar serviço.");
                 return;
             }
 
@@ -202,7 +319,7 @@ namespace FullSoundApp
 
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
 
-                    cmd.Parameters.AddWithValue("@id_cliente", cbClientes.SelectedValue);
+                    cmd.Parameters.AddWithValue("@id_cliente", idCliente);
                     cmd.Parameters.AddWithValue("@data", dtpData.Value.Date);
                     cmd.Parameters.AddWithValue("@hora", mtxHora.Text);
                     cmd.Parameters.AddWithValue("@tipo_servico", tipoServico);
@@ -211,11 +328,10 @@ namespace FullSoundApp
 
                     MessageBox.Show("Agendamento salvo com sucesso!");
 
-                    Carregar();
-
-                    cbClientes.SelectedIndex = -1;
                     comboTipoServico.SelectedIndex = -1;
                     mtxHora.Clear();
+
+                    CarregarPorCliente(idCliente);
                 }
                 catch (Exception ex)
                 {
@@ -239,10 +355,10 @@ namespace FullSoundApp
                 if (rowIndex < 0)
                     return;
 
-                if (!dgvAgendamentos.Columns.Contains("id_servico"))
+                if (!dgvAgendamentos.Columns.Contains("ID"))
                     return;
 
-                object valor = dgvAgendamentos.Rows[rowIndex].Cells["id_servico"].Value;
+                object valor = dgvAgendamentos.Rows[rowIndex].Cells["ID"].Value;
 
                 if (valor == null || valor == DBNull.Value)
                     return;
@@ -262,10 +378,10 @@ namespace FullSoundApp
                 if (dgvAgendamentos.CurrentRow == null)
                     return false;
 
-                if (!dgvAgendamentos.Columns.Contains("id_servico"))
+                if (!dgvAgendamentos.Columns.Contains("ID"))
                     return false;
 
-                object valor = dgvAgendamentos.CurrentRow.Cells["id_servico"].Value;
+                object valor = dgvAgendamentos.CurrentRow.Cells["ID"].Value;
 
                 if (valor == null || valor == DBNull.Value)
                     return false;
@@ -283,13 +399,17 @@ namespace FullSoundApp
 
         private void AbrirTelaOrcamento()
         {
-            if (!SelecionarAgendamentoAtual())
+            // Se tiver uma linha selecionada, abre orçamento daquele agendamento.
+            if (SelecionarAgendamentoAtual())
             {
-                MessageBox.Show("Clique em um agendamento da tabela antes de abrir o orçamento.");
+                Orçamentos orcamentosSelecionado = new Orçamentos(idServico);
+                this.Hide();
+                orcamentosSelecionado.Show();
                 return;
             }
 
-            Orçamentos orcamentos = new Orçamentos(idServico);
+            // Se não tiver linha selecionada, abre a tela de orçamento normalmente.
+            Orçamentos orcamentos = new Orçamentos(0);
             this.Hide();
             orcamentos.Show();
         }
@@ -321,11 +441,6 @@ namespace FullSoundApp
         private void pictureBox1_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        private void cbClientes_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void btnAdicionarServico_Click(object sender, EventArgs e)

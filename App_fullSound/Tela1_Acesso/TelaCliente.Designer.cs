@@ -109,7 +109,7 @@
             LbTipoDePagamento.ForeColor = Color.White;
             LbTipoDePagamento.Location = new Point(945, 51);
             LbTipoDePagamento.Name = "LbTipoDePagamento";
-            LbTipoDePagamento.Size = new Size(92, 15);
+            LbTipoDePagamento.Size = new Size(91, 15);
             LbTipoDePagamento.TabIndex = 13;
             LbTipoDePagamento.Text = "Tipo do veículo:";
             // 
@@ -385,6 +385,7 @@
             // btnAdicionarClient
             // 
             btnAdicionarClient.BackColor = Color.DarkOrange;
+            btnAdicionarClient.Cursor = Cursors.Hand;
             btnAdicionarClient.FlatStyle = FlatStyle.Flat;
             btnAdicionarClient.ForeColor = Color.Black;
             btnAdicionarClient.Location = new Point(781, 162);
@@ -398,6 +399,7 @@
             // btnRemoverCliente
             // 
             btnRemoverCliente.BackColor = Color.DarkOrange;
+            btnRemoverCliente.Cursor = Cursors.Hand;
             btnRemoverCliente.FlatStyle = FlatStyle.Flat;
             btnRemoverCliente.ForeColor = Color.Black;
             btnRemoverCliente.Location = new Point(781, 242);
@@ -406,11 +408,11 @@
             btnRemoverCliente.TabIndex = 97;
             btnRemoverCliente.Text = "Remover Cliente";
             btnRemoverCliente.UseVisualStyleBackColor = false;
-            btnRemoverCliente.Click += btnRemoverCliente_Click_1;
             // 
             // btnAlterarCliente
             // 
             btnAlterarCliente.BackColor = Color.DarkOrange;
+            btnAlterarCliente.Cursor = Cursors.Hand;
             btnAlterarCliente.FlatStyle = FlatStyle.Flat;
             btnAlterarCliente.ForeColor = Color.Black;
             btnAlterarCliente.Location = new Point(781, 201);

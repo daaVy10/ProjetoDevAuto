@@ -68,6 +68,7 @@
             // 
             // pbAgenda
             // 
+            pbAgenda.Cursor = Cursors.Hand;
             pbAgenda.ErrorImage = null;
             pbAgenda.Image = (Image)resources.GetObject("pbAgenda.Image");
             pbAgenda.Location = new Point(22, 329);
@@ -80,6 +81,7 @@
             // 
             // pbClientes
             // 
+            pbClientes.Cursor = Cursors.Hand;
             pbClientes.ErrorImage = null;
             pbClientes.Image = (Image)resources.GetObject("pbClientes.Image");
             pbClientes.Location = new Point(27, 262);
@@ -92,6 +94,7 @@
             // 
             // pbOrcamento
             // 
+            pbOrcamento.Cursor = Cursors.Hand;
             pbOrcamento.ErrorImage = null;
             pbOrcamento.Image = (Image)resources.GetObject("pbOrcamento.Image");
             pbOrcamento.Location = new Point(22, 422);
@@ -215,6 +218,7 @@
             // 
             // pictureBox2
             // 
+            pictureBox2.Cursor = Cursors.Hand;
             pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
             pictureBox2.Location = new Point(16, 527);
             pictureBox2.Name = "pictureBox2";

@@ -335,8 +335,13 @@ namespace Tela1_Acesso
             // PRECISA CLICAR NO SERVIÇO
             if (_idServico <= 0)
             {
+                PegarIdServicoDaLinhaAtual();
+            }
+
+            if (_idServico <= 0)
+            {
                 MessageBox.Show(
-                    "Clique no serviço desejado na lista antes de adicionar o valor.");
+                    "Selecione um serviço na lista antes de adicionar o valor.");
                 return;
             }
 
@@ -413,7 +418,28 @@ namespace Tela1_Acesso
                 }
             }
         }
+        private void PegarIdServicoDaLinhaAtual()
+        {
+            try
+            {
+                if (dgvListadeServicos.CurrentRow == null)
+                    return;
 
+                if (!dgvListadeServicos.Columns.Contains("ID"))
+                    return;
+
+                object valor = dgvListadeServicos.CurrentRow.Cells["ID"].Value;
+
+                if (valor == null || valor == DBNull.Value)
+                    return;
+
+                _idServico = Convert.ToInt32(valor);
+            }
+            catch
+            {
+                _idServico = 0;
+            }
+        }
         private void btnEmitirComprovante_Click(
             object sender,
             EventArgs e)

@@ -168,6 +168,7 @@ namespace FullSoundApp
             // 
             // pbHome
             // 
+            pbHome.Cursor = Cursors.Hand;
             pbHome.Image = (Image)resources.GetObject("pbHome.Image");
             pbHome.Location = new Point(24, 174);
             pbHome.Name = "pbHome";
@@ -221,6 +222,7 @@ namespace FullSoundApp
             // 
             // pictureBox1
             // 
+            pictureBox1.Cursor = Cursors.Hand;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
             pictureBox1.Location = new Point(16, 527);
             pictureBox1.Name = "pictureBox1";
@@ -265,6 +267,7 @@ namespace FullSoundApp
             // 
             // pbOrcamento
             // 
+            pbOrcamento.Cursor = Cursors.Hand;
             pbOrcamento.ErrorImage = null;
             pbOrcamento.Image = (Image)resources.GetObject("pbOrcamento.Image");
             pbOrcamento.Location = new Point(24, 414);
@@ -277,6 +280,7 @@ namespace FullSoundApp
             // 
             // pbClientes
             // 
+            pbClientes.Cursor = Cursors.Hand;
             pbClientes.ErrorImage = null;
             pbClientes.Image = (Image)resources.GetObject("pbClientes.Image");
             pbClientes.Location = new Point(24, 253);

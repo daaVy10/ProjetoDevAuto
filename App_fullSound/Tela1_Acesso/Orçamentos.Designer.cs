@@ -239,6 +239,7 @@
             // 
             // pbAgenda
             // 
+            pbAgenda.Cursor = Cursors.Hand;
             pbAgenda.ErrorImage = null;
             pbAgenda.Image = (Image)resources.GetObject("pbAgenda.Image");
             pbAgenda.Location = new Point(20, 329);
@@ -281,6 +282,7 @@
             // 
             // pictureBox1
             // 
+            pictureBox1.Cursor = Cursors.Hand;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
             pictureBox1.Location = new Point(16, 527);
             pictureBox1.Name = "pictureBox1";
@@ -291,6 +293,7 @@
             // 
             // pbHome
             // 
+            pbHome.Cursor = Cursors.Hand;
             pbHome.Image = (Image)resources.GetObject("pbHome.Image");
             pbHome.Location = new Point(26, 180);
             pbHome.Name = "pbHome";
@@ -323,6 +326,7 @@
             // 
             // pbClientes
             // 
+            pbClientes.Cursor = Cursors.Hand;
             pbClientes.ErrorImage = null;
             pbClientes.Image = (Image)resources.GetObject("pbClientes.Image");
             pbClientes.Location = new Point(25, 260);
