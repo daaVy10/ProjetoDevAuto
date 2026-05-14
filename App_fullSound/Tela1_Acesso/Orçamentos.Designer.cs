@@ -98,7 +98,7 @@
             dgvListadeServicos.RowHeadersVisible = false;
             dgvListadeServicos.Size = new Size(929, 325);
             dgvListadeServicos.TabIndex = 66;
-         
+            // 
             // Data
             // 
             Data.HeaderText = "Data";
@@ -377,6 +377,7 @@
             btnEmitirComprovante.Text = "Emitir Comprovante";
             btnEmitirComprovante.TextAlign = ContentAlignment.MiddleRight;
             btnEmitirComprovante.UseVisualStyleBackColor = false;
+            btnEmitirComprovante.Click += btnEmitirComprovante_Click;
             // 
             // pbOrcamento
             // 

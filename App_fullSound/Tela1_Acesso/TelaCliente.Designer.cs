@@ -60,6 +60,16 @@
             btnAdicionarClient = new Button();
             btnRemoverCliente = new Button();
             btnAlterarCliente = new Button();
+            pnlAlterarCliente = new Panel();
+            lbltel = new Label();
+            lblnome = new Label();
+            btnCancelarAlteracao = new Button();
+            btnSalvarAlteracao = new Button();
+            rbAlterarSuv = new RadioButton();
+            rbAlterarSedan = new RadioButton();
+            rbAlterarHatch = new RadioButton();
+            txtAlterarCelular = new TextBox();
+            txtAlterarNome = new TextBox();
             ((System.ComponentModel.ISupportInitialize)dgvClientes).BeginInit();
             gbTipodePagamento.SuspendLayout();
             panel1.SuspendLayout();
@@ -70,6 +80,7 @@
             ((System.ComponentModel.ISupportInitialize)pbAgenda).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
+            pnlAlterarCliente.SuspendLayout();
             SuspendLayout();
             // 
             // LbNome
@@ -224,6 +235,7 @@
             // 
             // pictureBox3
             // 
+            pictureBox3.Cursor = Cursors.Hand;
             pictureBox3.Image = (Image)resources.GetObject("pictureBox3.Image");
             pictureBox3.Location = new Point(21, 180);
             pictureBox3.Name = "pictureBox3";
@@ -246,6 +258,7 @@
             // 
             // pictureBox2
             // 
+            pictureBox2.Cursor = Cursors.Hand;
             pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
             pictureBox2.Location = new Point(16, 527);
             pictureBox2.Name = "pictureBox2";
@@ -312,6 +325,7 @@
             // 
             // pbOrcamento
             // 
+            pbOrcamento.Cursor = Cursors.Hand;
             pbOrcamento.ErrorImage = null;
             pbOrcamento.Image = (Image)resources.GetObject("pbOrcamento.Image");
             pbOrcamento.Location = new Point(16, 424);
@@ -324,6 +338,7 @@
             // 
             // pictureBox1
             // 
+            pictureBox1.Cursor = Cursors.Hand;
             pictureBox1.ErrorImage = null;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
             pictureBox1.Location = new Point(21, 262);
@@ -335,6 +350,7 @@
             // 
             // pbAgenda
             // 
+            pbAgenda.Cursor = Cursors.Hand;
             pbAgenda.ErrorImage = null;
             pbAgenda.Image = (Image)resources.GetObject("pbAgenda.Image");
             pbAgenda.Location = new Point(16, 331);
@@ -390,6 +406,7 @@
             btnRemoverCliente.TabIndex = 97;
             btnRemoverCliente.Text = "Remover Cliente";
             btnRemoverCliente.UseVisualStyleBackColor = false;
+            btnRemoverCliente.Click += btnRemoverCliente_Click_1;
             // 
             // btnAlterarCliente
             // 
@@ -400,8 +417,115 @@
             btnAlterarCliente.Name = "btnAlterarCliente";
             btnAlterarCliente.Size = new Size(124, 23);
             btnAlterarCliente.TabIndex = 98;
-            btnAlterarCliente.Text = "Alterar Cliente";
+            btnAlterarCliente.Text = "Alterar Dados";
             btnAlterarCliente.UseVisualStyleBackColor = false;
+            btnAlterarCliente.Click += btnAlterarCliente_Click;
+            // 
+            // pnlAlterarCliente
+            // 
+            pnlAlterarCliente.Controls.Add(lbltel);
+            pnlAlterarCliente.Controls.Add(lblnome);
+            pnlAlterarCliente.Controls.Add(btnCancelarAlteracao);
+            pnlAlterarCliente.Controls.Add(btnSalvarAlteracao);
+            pnlAlterarCliente.Controls.Add(rbAlterarSuv);
+            pnlAlterarCliente.Controls.Add(rbAlterarSedan);
+            pnlAlterarCliente.Controls.Add(rbAlterarHatch);
+            pnlAlterarCliente.Controls.Add(txtAlterarCelular);
+            pnlAlterarCliente.Controls.Add(txtAlterarNome);
+            pnlAlterarCliente.Location = new Point(1024, 284);
+            pnlAlterarCliente.Name = "pnlAlterarCliente";
+            pnlAlterarCliente.Size = new Size(366, 278);
+            pnlAlterarCliente.TabIndex = 99;
+            pnlAlterarCliente.Visible = false;
+            // 
+            // lbltel
+            // 
+            lbltel.AutoSize = true;
+            lbltel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lbltel.Location = new Point(215, 25);
+            lbltel.Name = "lbltel";
+            lbltel.Size = new Size(59, 15);
+            lbltel.TabIndex = 8;
+            lbltel.Text = "Telefone:";
+            // 
+            // lblnome
+            // 
+            lblnome.AutoSize = true;
+            lblnome.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblnome.Location = new Point(35, 25);
+            lblnome.Name = "lblnome";
+            lblnome.Size = new Size(44, 15);
+            lblnome.TabIndex = 7;
+            lblnome.Text = "Nome:";
+            // 
+            // btnCancelarAlteracao
+            // 
+            btnCancelarAlteracao.ForeColor = Color.Black;
+            btnCancelarAlteracao.Location = new Point(244, 236);
+            btnCancelarAlteracao.Name = "btnCancelarAlteracao";
+            btnCancelarAlteracao.Size = new Size(94, 23);
+            btnCancelarAlteracao.TabIndex = 6;
+            btnCancelarAlteracao.Text = "Cancelar";
+            btnCancelarAlteracao.UseVisualStyleBackColor = true;
+            btnCancelarAlteracao.Click += btnCancelarAlteracao_Click;
+            // 
+            // btnSalvarAlteracao
+            // 
+            btnSalvarAlteracao.ForeColor = Color.Black;
+            btnSalvarAlteracao.Location = new Point(41, 236);
+            btnSalvarAlteracao.Name = "btnSalvarAlteracao";
+            btnSalvarAlteracao.Size = new Size(94, 23);
+            btnSalvarAlteracao.TabIndex = 5;
+            btnSalvarAlteracao.Text = "Salvar";
+            btnSalvarAlteracao.UseVisualStyleBackColor = true;
+            btnSalvarAlteracao.Click += btnSalvarAlteracao_Click;
+            // 
+            // rbAlterarSuv
+            // 
+            rbAlterarSuv.AutoSize = true;
+            rbAlterarSuv.Location = new Point(35, 186);
+            rbAlterarSuv.Name = "rbAlterarSuv";
+            rbAlterarSuv.Size = new Size(46, 19);
+            rbAlterarSuv.TabIndex = 4;
+            rbAlterarSuv.TabStop = true;
+            rbAlterarSuv.Text = "SUV";
+            rbAlterarSuv.UseVisualStyleBackColor = true;
+            // 
+            // rbAlterarSedan
+            // 
+            rbAlterarSedan.AutoSize = true;
+            rbAlterarSedan.Location = new Point(35, 150);
+            rbAlterarSedan.Name = "rbAlterarSedan";
+            rbAlterarSedan.Size = new Size(57, 19);
+            rbAlterarSedan.TabIndex = 3;
+            rbAlterarSedan.TabStop = true;
+            rbAlterarSedan.Text = "Sedan";
+            rbAlterarSedan.UseVisualStyleBackColor = true;
+            // 
+            // rbAlterarHatch
+            // 
+            rbAlterarHatch.AutoSize = true;
+            rbAlterarHatch.Location = new Point(35, 116);
+            rbAlterarHatch.Name = "rbAlterarHatch";
+            rbAlterarHatch.Size = new Size(57, 19);
+            rbAlterarHatch.TabIndex = 2;
+            rbAlterarHatch.TabStop = true;
+            rbAlterarHatch.Text = "Hatch";
+            rbAlterarHatch.UseVisualStyleBackColor = true;
+            // 
+            // txtAlterarCelular
+            // 
+            txtAlterarCelular.Location = new Point(215, 59);
+            txtAlterarCelular.Name = "txtAlterarCelular";
+            txtAlterarCelular.Size = new Size(123, 23);
+            txtAlterarCelular.TabIndex = 1;
+            // 
+            // txtAlterarNome
+            // 
+            txtAlterarNome.Location = new Point(35, 59);
+            txtAlterarNome.Name = "txtAlterarNome";
+            txtAlterarNome.Size = new Size(146, 23);
+            txtAlterarNome.TabIndex = 0;
             // 
             // TelaCliente
             // 
@@ -410,6 +534,7 @@
             BackColor = Color.Black;
             BackgroundImageLayout = ImageLayout.None;
             ClientSize = new Size(1419, 624);
+            Controls.Add(pnlAlterarCliente);
             Controls.Add(btnAlterarCliente);
             Controls.Add(btnRemoverCliente);
             Controls.Add(btnAdicionarClient);
@@ -439,6 +564,8 @@
             ((System.ComponentModel.ISupportInitialize)pbAgenda).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
+            pnlAlterarCliente.ResumeLayout(false);
+            pnlAlterarCliente.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -477,5 +604,15 @@
         private DataGridViewTextBoxColumn ColTipodoVeiculo;
         private Button btnRemoverCliente;
         private Button btnAlterarCliente;
+        private Panel pnlAlterarCliente;
+        private Button btnCancelarAlteracao;
+        private Button btnSalvarAlteracao;
+        private RadioButton rbAlterarSuv;
+        private RadioButton rbAlterarSedan;
+        private RadioButton rbAlterarHatch;
+        private TextBox txtAlterarCelular;
+        private TextBox txtAlterarNome;
+        private Label lbltel;
+        private Label lblnome;
     }
 }
