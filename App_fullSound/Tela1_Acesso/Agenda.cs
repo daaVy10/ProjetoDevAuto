@@ -399,7 +399,6 @@ namespace FullSoundApp
 
         private void AbrirTelaOrcamento()
         {
-            // Se tiver uma linha selecionada, abre orçamento daquele agendamento.
             if (SelecionarAgendamentoAtual())
             {
                 Orçamentos orcamentosSelecionado = new Orçamentos(idServico);
@@ -408,7 +407,6 @@ namespace FullSoundApp
                 return;
             }
 
-            // Se não tiver linha selecionada, abre a tela de orçamento normalmente.
             Orçamentos orcamentos = new Orçamentos(0);
             this.Hide();
             orcamentos.Show();

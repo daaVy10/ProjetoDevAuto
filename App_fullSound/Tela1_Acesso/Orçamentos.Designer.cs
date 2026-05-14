@@ -29,12 +29,12 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Orçamentos));
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             label2 = new Label();
             dgvListadeServicos = new DataGridView();
-            Data = new DataGridViewTextBoxColumn();
-            Servico = new DataGridViewTextBoxColumn();
-            Valor = new DataGridViewTextBoxColumn();
-            Status = new DataGridViewTextBoxColumn();
             panelfluxodecaixa = new Panel();
             label7 = new Label();
             label6 = new Label();
@@ -63,6 +63,10 @@
             lblValor = new Label();
             btnAdicionar = new Button();
             cbClientes = new ComboBox();
+            Data = new DataGridViewTextBoxColumn();
+            Servico = new DataGridViewTextBoxColumn();
+            Valor = new DataGridViewTextBoxColumn();
+            Status = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dgvListadeServicos).BeginInit();
             panelfluxodecaixa.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)obOrcamento).BeginInit();
@@ -93,31 +97,12 @@
             dgvListadeServicos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvListadeServicos.Columns.AddRange(new DataGridViewColumn[] { Data, Servico, Valor, Status });
             dgvListadeServicos.Enabled = false;
+            dgvListadeServicos.EnableHeadersVisualStyles = false;
             dgvListadeServicos.Location = new Point(431, 287);
             dgvListadeServicos.Name = "dgvListadeServicos";
             dgvListadeServicos.RowHeadersVisible = false;
             dgvListadeServicos.Size = new Size(929, 325);
             dgvListadeServicos.TabIndex = 66;
-            // 
-            // Data
-            // 
-            Data.HeaderText = "Data";
-            Data.Name = "Data";
-            // 
-            // Servico
-            // 
-            Servico.HeaderText = "Servico";
-            Servico.Name = "Servico";
-            // 
-            // Valor
-            // 
-            Valor.HeaderText = "Valor";
-            Valor.Name = "Valor";
-            // 
-            // Status
-            // 
-            Status.HeaderText = "Status";
-            Status.Name = "Status";
             // 
             // panelfluxodecaixa
             // 
@@ -444,6 +429,38 @@
             cbClientes.Size = new Size(169, 23);
             cbClientes.TabIndex = 117;
             // 
+            // Data
+            // 
+            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(45, 45, 45);
+            dataGridViewCellStyle1.SelectionForeColor = Color.Orange;
+            Data.DefaultCellStyle = dataGridViewCellStyle1;
+            Data.HeaderText = "Data";
+            Data.Name = "Data";
+            // 
+            // Servico
+            // 
+            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(45, 45, 45);
+            dataGridViewCellStyle2.SelectionForeColor = Color.Orange;
+            Servico.DefaultCellStyle = dataGridViewCellStyle2;
+            Servico.HeaderText = "Servico";
+            Servico.Name = "Servico";
+            // 
+            // Valor
+            // 
+            dataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(45, 45, 45);
+            dataGridViewCellStyle3.SelectionForeColor = Color.Orange;
+            Valor.DefaultCellStyle = dataGridViewCellStyle3;
+            Valor.HeaderText = "Valor";
+            Valor.Name = "Valor";
+            // 
+            // Status
+            // 
+            dataGridViewCellStyle4.SelectionBackColor = Color.FromArgb(45, 45, 45);
+            dataGridViewCellStyle4.SelectionForeColor = Color.Orange;
+            Status.DefaultCellStyle = dataGridViewCellStyle4;
+            Status.HeaderText = "Status";
+            Status.Name = "Status";
+            // 
             // Orçamentos
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -532,10 +549,6 @@
         private PictureBox pictureBox3;
         private PictureBox pbClientes;
         private Button btnEmitirComprovante;
-        private DataGridViewTextBoxColumn Data;
-        private DataGridViewTextBoxColumn Servico;
-        private DataGridViewTextBoxColumn Valor;
-        private DataGridViewTextBoxColumn Status;
         private PictureBox pictureBox4;
         private PictureBox pbOrcamento;
         private Label label8;
@@ -543,5 +556,9 @@
         private Label lblValor;
         private Button btnAdicionar;
         private ComboBox cbClientes;
+        private DataGridViewTextBoxColumn Data;
+        private DataGridViewTextBoxColumn Servico;
+        private DataGridViewTextBoxColumn Valor;
+        private DataGridViewTextBoxColumn Status;
     }
 }

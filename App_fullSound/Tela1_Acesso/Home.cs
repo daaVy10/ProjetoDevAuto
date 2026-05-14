@@ -1,6 +1,5 @@
 ﻿using FullSoundApp;
 using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace Tela1_Acesso
@@ -48,8 +47,6 @@ namespace Tela1_Acesso
 
         private void pbOrcamento_Click(object sender, EventArgs e)
         {
-            // Abre Orçamentos sem agendamento selecionado.
-            // Na tela Orçamentos, ele vai listar os serviços.
             Orçamentos telaorcamentos = new Orçamentos(0);
             telaorcamentos.Show();
             this.Hide();

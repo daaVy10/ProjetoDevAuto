@@ -2,7 +2,6 @@
 using MySql.Data.MySqlClient;
 using System;
 using System.Data;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace Tela1_Acesso
@@ -45,59 +44,30 @@ namespace Tela1_Acesso
 
         private void TelaCliente_Load_1(object sender, EventArgs e)
         {
-            ConfigurarDgvClientes();
+            PrepararDgvClientes();
             CarregarClientes();
 
             pnlAlterarCliente.Visible = false;
         }
 
-        private void ConfigurarDgvClientes()
+        private void PrepararDgvClientes()
         {
             dgvClientes.AutoGenerateColumns = false;
-            dgvClientes.Columns.Clear();
 
-            DataGridViewTextBoxColumn colId = new DataGridViewTextBoxColumn();
-            colId.Name = "colIdCliente";
-            colId.HeaderText = "ID";
-            colId.Visible = false;
-            dgvClientes.Columns.Add(colId);
+            if (!dgvClientes.Columns.Contains("colIdCliente"))
+            {
+                DataGridViewTextBoxColumn colId = new DataGridViewTextBoxColumn();
+                colId.Name = "colIdCliente";
+                colId.HeaderText = "ID";
+                colId.Visible = false;
 
-            dgvClientes.Columns.Add("colNome", "Nome");
-            dgvClientes.Columns.Add("colCelular", "Celular");
-            dgvClientes.Columns.Add("colTipo", "Tipo de Veículo");
+                dgvClientes.Columns.Insert(0, colId);
+            }
 
-            dgvClientes.RowHeadersVisible = false;
             dgvClientes.AllowUserToAddRows = false;
-            dgvClientes.AllowUserToDeleteRows = false;
-            dgvClientes.AllowUserToResizeRows = false;
-            dgvClientes.AllowUserToResizeColumns = false;
-
             dgvClientes.ReadOnly = true;
             dgvClientes.MultiSelect = false;
             dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvClientes.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            dgvClientes.BackgroundColor = Color.FromArgb(32, 32, 32);
-            dgvClientes.BorderStyle = BorderStyle.None;
-
-            dgvClientes.EnableHeadersVisualStyles = false;
-
-            dgvClientes.ColumnHeadersDefaultCellStyle.BackColor = Color.White;
-            dgvClientes.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black;
-
-            // REMOVE O AZUL DO CABEÇALHO
-            dgvClientes.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.White;
-            dgvClientes.ColumnHeadersDefaultCellStyle.SelectionForeColor = Color.Black;
-
-            dgvClientes.DefaultCellStyle.BackColor = Color.White;
-            dgvClientes.DefaultCellStyle.ForeColor = Color.Black;
-
-            // COR DA LINHA SELECIONADA
-            dgvClientes.DefaultCellStyle.SelectionBackColor = Color.DarkOrange;
-            dgvClientes.DefaultCellStyle.SelectionForeColor = Color.Black;
-
-            dgvClientes.GridColor = Color.Gray;
-            dgvClientes.ClearSelection();
         }
 
         private void CarregarClientes()
@@ -234,10 +204,10 @@ namespace Tela1_Acesso
 
                 idClienteSelecionado = Convert.ToInt32(valorId);
 
-                txtNome.Text = dgvClientes.Rows[e.RowIndex].Cells["colNome"].Value.ToString();
-                txtCelular.Text = dgvClientes.Rows[e.RowIndex].Cells["colCelular"].Value.ToString();
+                txtNome.Text = dgvClientes.Rows[e.RowIndex].Cells[1].Value.ToString();
+                txtCelular.Text = dgvClientes.Rows[e.RowIndex].Cells[2].Value.ToString();
 
-                string tipo = dgvClientes.Rows[e.RowIndex].Cells["colTipo"].Value.ToString();
+                string tipo = dgvClientes.Rows[e.RowIndex].Cells[3].Value.ToString();
 
                 rbHatch.Checked = tipo == "HATCH";
                 rbSedan.Checked = tipo == "SEDAN";
@@ -254,6 +224,64 @@ namespace Tela1_Acesso
 
         }
 
+        private int ContarAgendamentosDoCliente()
+        {
+            int total = 0;
+
+            using (MySqlConnection conn = new MySqlConnection(conexao))
+            {
+                conn.Open();
+
+                string sql = @"
+                    SELECT COUNT(*)
+                    FROM agenda
+                    WHERE id_cliente = @id_cliente";
+
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@id_cliente", idClienteSelecionado);
+
+                total = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+
+            return total;
+        }
+
+        private void ExcluirClienteEAgendamentos()
+        {
+            using (MySqlConnection conn = new MySqlConnection(conexao))
+            {
+                conn.Open();
+
+                MySqlTransaction transacao = conn.BeginTransaction();
+
+                try
+                {
+                    string sqlAgenda = @"
+                        DELETE FROM agenda
+                        WHERE id_cliente = @id_cliente";
+
+                    MySqlCommand cmdAgenda = new MySqlCommand(sqlAgenda, conn, transacao);
+                    cmdAgenda.Parameters.AddWithValue("@id_cliente", idClienteSelecionado);
+                    cmdAgenda.ExecuteNonQuery();
+
+                    string sqlCliente = @"
+                        DELETE FROM Clientes
+                        WHERE id_cliente = @id_cliente";
+
+                    MySqlCommand cmdCliente = new MySqlCommand(sqlCliente, conn, transacao);
+                    cmdCliente.Parameters.AddWithValue("@id_cliente", idClienteSelecionado);
+                    cmdCliente.ExecuteNonQuery();
+
+                    transacao.Commit();
+                }
+                catch
+                {
+                    transacao.Rollback();
+                    throw;
+                }
+            }
+        }
+
         private void btnRemoverCliente_Click(object sender, EventArgs e)
         {
             if (idClienteSelecionado <= 0)
@@ -262,41 +290,64 @@ namespace Tela1_Acesso
                 return;
             }
 
-            DialogResult resposta = MessageBox.Show(
-                "Deseja remover este cliente?",
-                "Confirmar remoção",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question
-            );
+            string nomeCliente = "selecionado";
+
+            if (dgvClientes.CurrentRow != null)
+            {
+                nomeCliente = dgvClientes.CurrentRow.Cells[1].Value.ToString();
+            }
+
+            int totalAgendamentos;
+
+            try
+            {
+                totalAgendamentos = ContarAgendamentosDoCliente();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao verificar agendamentos do cliente: " + ex.Message);
+                return;
+            }
+
+            DialogResult resposta;
+
+            if (totalAgendamentos > 0)
+            {
+                resposta = MessageBox.Show(
+                    "O cliente \"" + nomeCliente + "\" possui " + totalAgendamentos +
+                    " agendamento(s) e serviço(s) cadastrados.\n\n" +
+                    "Se você excluir este cliente, todos os agendamentos e serviços ligados a ele também serão excluídos.\n\n" +
+                    "Deseja realmente excluir?",
+                    "Cliente possui agendamentos",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning
+                );
+            }
+            else
+            {
+                resposta = MessageBox.Show(
+                    "Deseja realmente remover o cliente \"" + nomeCliente + "\"?",
+                    "Confirmar remoção",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+            }
 
             if (resposta != DialogResult.Yes)
                 return;
 
-            using (MySqlConnection conn = new MySqlConnection(conexao))
+            try
             {
-                try
-                {
-                    conn.Open();
+                ExcluirClienteEAgendamentos();
 
-                    string sql = "DELETE FROM Clientes WHERE id_cliente = @id_cliente";
+                MessageBox.Show("Cliente removido com sucesso!");
 
-                    MySqlCommand cmd = new MySqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@id_cliente", idClienteSelecionado);
-
-                    cmd.ExecuteNonQuery();
-
-                    MessageBox.Show("Cliente removido com sucesso!");
-
-                    LimparCampos();
-                    CarregarClientes();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        "Erro ao remover cliente. Verifique se ele não possui agendamentos cadastrados.\n\n" +
-                        ex.Message
-                    );
-                }
+                LimparCampos();
+                CarregarClientes();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao remover cliente: " + ex.Message);
             }
         }
 
@@ -314,10 +365,10 @@ namespace Tela1_Acesso
                 return;
             }
 
-            txtAlterarNome.Text = dgvClientes.CurrentRow.Cells["colNome"].Value.ToString();
-            txtAlterarCelular.Text = dgvClientes.CurrentRow.Cells["colCelular"].Value.ToString();
+            txtAlterarNome.Text = dgvClientes.CurrentRow.Cells[1].Value.ToString();
+            txtAlterarCelular.Text = dgvClientes.CurrentRow.Cells[2].Value.ToString();
 
-            string tipo = dgvClientes.CurrentRow.Cells["colTipo"].Value.ToString();
+            string tipo = dgvClientes.CurrentRow.Cells[3].Value.ToString();
 
             rbAlterarHatch.Checked = tipo == "HATCH";
             rbAlterarSedan.Checked = tipo == "SEDAN";
@@ -420,6 +471,8 @@ namespace Tela1_Acesso
             rbSUV.Checked = false;
 
             idClienteSelecionado = 0;
+
+            dgvClientes.ClearSelection();
 
             txtNome.Focus();
         }
